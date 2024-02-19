@@ -1,9 +1,10 @@
 <?php
-  session_start();
-  require 'conexion.php';
-  $db=conectarDB();
-
-  if(isset($_SESSION['login'])) {
+   session_start();
+   require 'conexion.php';
+   $db=conectarDB();
+   
+    
+   if(isset($_SESSION['login'])) {
     // El cliente ha iniciado sesión
     $auth = $_SESSION['login'];
     } else {
@@ -37,39 +38,23 @@
         $clte_id = null;
     }
 
-    if(!$auth || $rol!='A'){
+    if(!$auth){
     header('Location: /calistoshop/login.php');
     }
 
-  $query0="SELECT * FROM empleados WHERE correo='$correo'";
-  $resultado0=mysqli_query($db,$query0);
-
-
-  $usuario=mysqli_fetch_assoc($resultado0);
-
-  $jefe_id=$usuario['id'];
-
-   $id=$_GET['id'];
-   $id=filter_var($id,FILTER_VALIDATE_INT);
-
-   if(!$id){
-    header('Location: /calistoshop/listaArticulos.php');
-   }
-  
-
   if($_SERVER['REQUEST_METHOD']==='POST'){
 
-    $talla=$_POST['tallas'];
+    $categoria=$_POST['categoria'];
+    $estado=$_POST['estado'];
 
-    $query="INSERT INTO tallas (talla,ato_id) 
-    VALUES ('$talla','$id');";
-
+    $query="INSERT INTO categorias (categoria, estado) 
+    VALUES ('$categoria','$estado');";
 
     $resultado=mysqli_query($db,$query);
 
 
     if($resultado){
-        header('Location: /calistoshop/listaArticulos.php');
+        header('Location: /calistoshop/adminPage.php');
     }
 
 
@@ -77,20 +62,21 @@
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Articulo</title>
     <link rel="stylesheet" href="estilos/normalize.css">
     <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilos/styles.css">
     <link rel="shortcut icon" href="imagenes/logo.png">
-    <script src="js/validacion.js"></script>
+    <script src="js/validacion.js?2.0"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+    <title>Categoria</title>
 </head>
 
 <body>
+
     <header>
         <div class="logo">
           <a href="adminPage.php">
@@ -157,39 +143,41 @@
 
 		</ul>
 	</nav>
- 
-    <h3>Registro articulo</h3>
-    
 
-    <form class="formulario--colores" method="POST" name="fvalida" enctype="multipart/form-data" onsubmit="return validarArticulo()">
+
+    <h3>Registro categoria</h3>
+    <form class="formulario--proceso" method="POST" name="fvalida"  onsubmit="return validarProceso()">
         <fieldset>
-            <div class="contenedor-campos--colores">
+            <div class="contenedor-campos--proceso">
+                <div class="campo-proceso">
+                    <label><span>*</span>Nombre de la categoria</label>
+                    <input class="input-text" type="text" placeholder="Nombre" name="categoria" >
+                </div>
 
-                <div class="campo-articulo">
-                    <label><span></span>Tallas</label>
-                    <select class="input-text" name="tallas">
-                        <option>Talla</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
+                <div class="campo-proceso">
+                    <label><span>*</span>Estado</label>
+                    <select class="input-text" name="estado">
+                    <option disabled selected>--Estado--</option>
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
                     </select>
                 </div>
-               
+
             </div>
 
             <div class="alinear-derecha flex">
-                <input class="boton" type="submit" value="Agregar talla" >
+                <input class="boton" type="submit" value="Agregar categoria" >
             </div>
 
         </fieldset>
+
     </form>
 
     <footer id="footer" class="footer">
         <p class="footer__texto">Footer</p>
     </footer>
     <script src="js/scroll.js?1.0"></script>
+
 </body>
 
 </html>

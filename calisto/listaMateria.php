@@ -1,11 +1,11 @@
 <?php
-  session_start();
-  require 'conexion.php';
-  $db=conectarDB();
-
-  if(isset($_SESSION['login'])) {
-    // El cliente ha iniciado sesión
-    $auth = $_SESSION['login'];
+   session_start();
+   require 'conexion.php';
+    $db=conectarDB();
+   
+    if(isset($_SESSION['login'])) {
+        // El cliente ha iniciado sesión
+        $auth = $_SESSION['login'];
     } else {
         // El cliente no ha iniciado sesión
         $auth = null;
@@ -18,79 +18,81 @@
         // El cliente no ha iniciado sesión
         $rol = null;
     }
-
+    
     if(isset($_SESSION['usuario'])) {
         $correo = $_SESSION['usuario'];
         $query="SELECT * FROM empleados WHERE correo='$correo'";
-    $resultado=mysqli_query($db,$query);
-
-    $empeleado=mysqli_fetch_assoc($resultado);
-
-    $foto_de_perfil=$empeleado['foto_de_perfil'];
+     $resultado=mysqli_query($db,$query);
+    
+     $empeleado=mysqli_fetch_assoc($resultado);
+    
+     $foto_de_perfil=$empeleado['foto_de_perfil'];
     } else {
         $correo = null;
     }
-
+    
     if(isset($_SESSION['id'])) {
         $clte_id = $_SESSION['id'];
     } else {
         $clte_id = null;
     }
 
-    if(!$auth || $rol!='A'){
+   if(!$auth){
     header('Location: /calistoshop/login.php');
-    }
-
-  $query0="SELECT * FROM empleados WHERE correo='$correo'";
-  $resultado0=mysqli_query($db,$query0);
-
-
-  $usuario=mysqli_fetch_assoc($resultado0);
-
-  $jefe_id=$usuario['id'];
-
-   $id=$_GET['id'];
-   $id=filter_var($id,FILTER_VALIDATE_INT);
-
-   if(!$id){
-    header('Location: /calistoshop/listaArticulos.php');
    }
-  
 
-  if($_SERVER['REQUEST_METHOD']==='POST'){
+   $query="SELECT * FROM mta_primas";
+   $resultado=mysqli_query($db,$query);
 
-    $talla=$_POST['tallas'];
+   if($_SERVER['REQUEST_METHOD']==='POST'){
+    $id=$_POST['id'];
+    $id=filter_var($id,FILTER_VALIDATE_INT);
 
-    $query="INSERT INTO tallas (talla,ato_id) 
-    VALUES ('$talla','$id');";
+    if($id){
 
+        $queryMaterial="DELETE FROM material_utilizado WHERE mta_prima_id='$id'";
+        $resultadoMaterial=mysqli_query($db,$queryMaterial);
 
-    $resultado=mysqli_query($db,$query);
+        $queryPro="DELETE FROM pro_pedidos WHERE mta_prima_id='$id'";
+        $resultadoPro=mysqli_query($db,$queryPro);
 
-
-    if($resultado){
-        header('Location: /calistoshop/listaArticulos.php');
+        $query2="DELETE FROM mta_primas WHERE id='$id'";
+        $resultado2=mysqli_query($db,$query2);
+        if($resultado2){
+            header('Location: /calistoshop/listaMateria.php'); 
+        }
     }
-
 
   }
+   
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Articulo</title>
     <link rel="stylesheet" href="estilos/normalize.css">
     <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilos/styles.css">
     <link rel="shortcut icon" href="imagenes/logo.png">
-    <script src="js/validacion.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script src="js/validacion.js?3.0"></script>
+    <script src="js/buscador.js"></script>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+    <title>Lista de materia</title>
 </head>
 
 <body>
+
     <header>
         <div class="logo">
           <a href="adminPage.php">
@@ -157,39 +159,55 @@
 
 		</ul>
 	</nav>
- 
-    <h3>Registro articulo</h3>
+
+
+    <div class="buscarAdmin">
+         <input type="text" placeholder="Buscar" id="buscador" required />
+
+          <div class="btnAdmin">
+            <i class="fas fa-search iconSearch" ></i>
+          </div>
+    </div>
+
+    <table class="empleados">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre del proveedor</th>
+                <th>Nombre de la materia</th>
+                <th>Color</th>
+                <th>Talla</th>
+                <th>Unidad de medida</th>
+                <th>Existencias</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while($materia=mysqli_fetch_assoc($resultado)):?>
+            <tr class="filas">
+                <td><?php echo $materia['id']; ?></td>
+                <td><?php echo $materia['nombre_de_proveedor']; ?></td>
+                <td><?php echo $materia['tipo_de_mta_prima']; ?></td>
+                <td><?php echo $materia['color']; ?></td>
+                <td><?php echo $materia['talla']; ?></td>
+                <td><?php echo $materia['unidad_de_medida']; ?></td>
+                <td><?php echo $materia['existencias']; ?></td>
+                <td>
+                    <form method="POST">
+                     <input type="hidden" name="id" value="<?php echo $materia['id']; ?>">
+                     <input type="submit" value="Eliminar materia" class="boton-eliminar">
+                    </form>
+                </td>
+            </tr>
+            <?php endwhile;?>
+        </tbody>
+    </table>
     
-
-    <form class="formulario--colores" method="POST" name="fvalida" enctype="multipart/form-data" onsubmit="return validarArticulo()">
-        <fieldset>
-            <div class="contenedor-campos--colores">
-
-                <div class="campo-articulo">
-                    <label><span></span>Tallas</label>
-                    <select class="input-text" name="tallas">
-                        <option>Talla</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                    </select>
-                </div>
-               
-            </div>
-
-            <div class="alinear-derecha flex">
-                <input class="boton" type="submit" value="Agregar talla" >
-            </div>
-
-        </fieldset>
-    </form>
-
     <footer id="footer" class="footer">
         <p class="footer__texto">Footer</p>
     </footer>
     <script src="js/scroll.js?1.0"></script>
+
 </body>
 
 </html>

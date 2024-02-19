@@ -11,14 +11,6 @@
         $auth = null;
     }
 
-    if(isset($_SESSION['rol'])) {
-        // El cliente ha iniciado sesión
-        $rol = $_SESSION['rol'];
-    } else {
-        // El cliente no ha iniciado sesión
-        $rol = null;
-    }
-
     if(isset($_SESSION['usuario'])) {
         $correo = $_SESSION['usuario'];
         $query="SELECT * FROM empleados WHERE correo='$correo'";
@@ -37,39 +29,26 @@
         $clte_id = null;
     }
 
-    if(!$auth || $rol!='A'){
+    if(!$auth){
     header('Location: /calistoshop/login.php');
     }
 
-  $query0="SELECT * FROM empleados WHERE correo='$correo'";
-  $resultado0=mysqli_query($db,$query0);
-
-
-  $usuario=mysqli_fetch_assoc($resultado0);
-
-  $jefe_id=$usuario['id'];
-
-   $id=$_GET['id'];
-   $id=filter_var($id,FILTER_VALIDATE_INT);
-
-   if(!$id){
-    header('Location: /calistoshop/listaArticulos.php');
-   }
-  
-
   if($_SERVER['REQUEST_METHOD']==='POST'){
 
-    $talla=$_POST['tallas'];
+    $nombre_de_proveedor=$_POST['nombreProveedor'];
+    $nombre=$_POST['nombreMaterial'];
+    $color=$_POST['color'];
+    $estilo=$_POST['estilo'];
+    $talla=$_POST['talla'];
+    $unidad_de_medida=$_POST['unidadMedida'];
 
-    $query="INSERT INTO tallas (talla,ato_id) 
-    VALUES ('$talla','$id');";
-
+    $query="INSERT INTO mta_primas (nombre_de_proveedor, nombre, color, estilo,talla, unidad_de_medida) 
+    VALUES ('$nombre_de_proveedor','$nombre','$color','$estilo','$talla','$unidad_de_medida');";
 
     $resultado=mysqli_query($db,$query);
 
-
     if($resultado){
-        header('Location: /calistoshop/listaArticulos.php');
+        header('Location: /calistoshop/adminPage.php');
     }
 
 
@@ -79,18 +58,19 @@
 <html lang="en">
 
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Articulo</title>
     <link rel="stylesheet" href="estilos/normalize.css">
     <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilos/styles.css">
-    <link rel="shortcut icon" href="imagenes/logo.png">
     <script src="js/validacion.js"></script>
+    <link rel="shortcut icon" href="imagenes/logo.png">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
+    <title>Registro pedido</title>
 </head>
-
 <body>
+
     <header>
         <div class="logo">
           <a href="adminPage.php">
@@ -157,30 +137,34 @@
 
 		</ul>
 	</nav>
- 
-    <h3>Registro articulo</h3>
-    
 
-    <form class="formulario--colores" method="POST" name="fvalida" enctype="multipart/form-data" onsubmit="return validarArticulo()">
+    <h3>Registro materia</h3>
+
+    <form class="formulario--colores" method="POST" name="fvalida" enctype="multipart/form-data" >
         <fieldset>
             <div class="contenedor-campos--colores">
 
                 <div class="campo-articulo">
-                    <label><span></span>Tallas</label>
-                    <select class="input-text" name="tallas">
-                        <option>Talla</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
+                    <label><span>*</span>Materia prima</label>
+                    <select name="nombreProveedor" class="input-text">
+                        <option></option>
+                        <option value="Alibaba">Alibaba</option>
+                        <option value="Telas Poncho">Telas Poncho</option>
+                        <option value="Comex">Comex</option>
+                        <option value="Kompass">Kompass</option>
+                        <option value="Skytex">Skytex</option>
                     </select>
+                </div>
+
+                <div class="campo-articulo">
+                    <label><span>*</span>Cantidad</label>
+                    <input class="input-text" type="number" name="estilo">
                 </div>
                
             </div>
 
             <div class="alinear-derecha flex">
-                <input class="boton" type="submit" value="Agregar talla" >
+                <input class="boton" type="submit" value="Agregar color" >
             </div>
 
         </fieldset>
@@ -191,5 +175,4 @@
     </footer>
     <script src="js/scroll.js?1.0"></script>
 </body>
-
 </html>

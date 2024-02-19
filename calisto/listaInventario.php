@@ -1,11 +1,11 @@
 <?php
-  session_start();
-  require 'conexion.php';
-  $db=conectarDB();
-
-  if(isset($_SESSION['login'])) {
-    // El cliente ha iniciado sesión
-    $auth = $_SESSION['login'];
+   session_start();
+   require 'conexion.php';
+    $db=conectarDB();
+   
+    if(isset($_SESSION['login'])) {
+        // El cliente ha iniciado sesión
+        $auth = $_SESSION['login'];
     } else {
         // El cliente no ha iniciado sesión
         $auth = null;
@@ -18,79 +18,71 @@
         // El cliente no ha iniciado sesión
         $rol = null;
     }
-
+    
     if(isset($_SESSION['usuario'])) {
         $correo = $_SESSION['usuario'];
         $query="SELECT * FROM empleados WHERE correo='$correo'";
-    $resultado=mysqli_query($db,$query);
-
-    $empeleado=mysqli_fetch_assoc($resultado);
-
-    $foto_de_perfil=$empeleado['foto_de_perfil'];
+     $resultado=mysqli_query($db,$query);
+    
+     $empeleado=mysqli_fetch_assoc($resultado);
+    
+     $foto_de_perfil=$empeleado['foto_de_perfil'];
     } else {
         $correo = null;
     }
-
+    
     if(isset($_SESSION['id'])) {
         $clte_id = $_SESSION['id'];
     } else {
         $clte_id = null;
     }
 
-    if(!$auth || $rol!='A'){
+   if(!$auth){
     header('Location: /calistoshop/login.php');
-    }
-
-  $query0="SELECT * FROM empleados WHERE correo='$correo'";
-  $resultado0=mysqli_query($db,$query0);
-
-
-  $usuario=mysqli_fetch_assoc($resultado0);
-
-  $jefe_id=$usuario['id'];
-
-   $id=$_GET['id'];
-   $id=filter_var($id,FILTER_VALIDATE_INT);
-
-   if(!$id){
-    header('Location: /calistoshop/listaArticulos.php');
    }
-  
 
-  if($_SERVER['REQUEST_METHOD']==='POST'){
+   $query="SELECT articulos.id, articulos.nombre,articulos.imagen AS ato_imagen,colores.id AS col_id,colores.color, colores.imagen AS col_imagen, tallas.talla,tallas.id AS tal_id, inventario.existencias
+   FROM inventario
+   LEFT JOIN articulos ON inventario.ato_id=articulos.id
+   LEFT JOIN colores ON inventario.col_id = colores.id
+   LEFT JOIN tallas ON inventario.tal_id = tallas.id;";
+   $resultado=mysqli_query($db,$query);
 
-    $talla=$_POST['tallas'];
-
-    $query="INSERT INTO tallas (talla,ato_id) 
-    VALUES ('$talla','$id');";
-
-
-    $resultado=mysqli_query($db,$query);
-
-
-    if($resultado){
-        header('Location: /calistoshop/listaArticulos.php');
-    }
+   $query2="SELECT * FROM articulos";
+   $resultado2=mysqli_query($db,$query2);
 
 
+   if($_SERVER['REQUEST_METHOD']==='POST'){
+    
   }
+  
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Articulo</title>
     <link rel="stylesheet" href="estilos/normalize.css">
     <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilos/styles.css">
     <link rel="shortcut icon" href="imagenes/logo.png">
-    <script src="js/validacion.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script src="js/validacion.js?3.0"></script>
+    <script src="js/buscador.js"></script>
+    <title>Lista de empleados</title>
 </head>
 
 <body>
+
     <header>
         <div class="logo">
           <a href="adminPage.php">
@@ -157,39 +149,50 @@
 
 		</ul>
 	</nav>
- 
-    <h3>Registro articulo</h3>
+
+    <div class="buscarAdmin">
+         <input type="text" placeholder="Buscar" id="buscador" required />
+
+          <div class="btnAdmin">
+            <i class="fas fa-search iconSearch" ></i>
+          </div>
+    </div>
+
+    <table class="empleados">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Color</th>
+                <th>Imagen </th>
+                <th>Talla</th>
+                <th>Exitencias</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while($inventario=mysqli_fetch_assoc($resultado)):?>
+            <tr class="filas">
+                <td><?php echo $inventario['id']; ?></td>
+                <td><?php echo $inventario['nombre']; ?></td>
+                <td style="background-color: <?php echo $inventario['color']; ?>;"></td>
+                <td><img class="imagen-lista" src="imagenes/articulos/<?php echo $inventario['col_imagen']; ?>" onerror="this.src='imagenes/articulos/<?php echo $inventario['ato_imagen']; ?>'"></td>
+                <td><?php echo $inventario['talla']; ?></td>
+                <td><?php echo $inventario['existencias']; ?></td>
+                <td>
+                    <a href="registroMaterialUtilizado.php?id=<?php echo $inventario['id']; ?>&col_id=<?php echo $inventario['col_id']; ?>&tal_id=<?php echo $inventario['tal_id']; ?>" class="boton-registrar-precio" >Registro material</a>
+                    <a href="actualizarExistencias.php?id=<?php echo $inventario['id']; ?>&col_id=<?php echo $inventario['col_id']; ?>&tal_id=<?php echo $inventario['tal_id']; ?>" class="boton-actualizar" >Actualizar existencias</a>
+                </td>
+            </tr>
+            <?php endwhile;?>
+        </tbody>
+    </table>
     
-
-    <form class="formulario--colores" method="POST" name="fvalida" enctype="multipart/form-data" onsubmit="return validarArticulo()">
-        <fieldset>
-            <div class="contenedor-campos--colores">
-
-                <div class="campo-articulo">
-                    <label><span></span>Tallas</label>
-                    <select class="input-text" name="tallas">
-                        <option>Talla</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                    </select>
-                </div>
-               
-            </div>
-
-            <div class="alinear-derecha flex">
-                <input class="boton" type="submit" value="Agregar talla" >
-            </div>
-
-        </fieldset>
-    </form>
-
     <footer id="footer" class="footer">
         <p class="footer__texto">Footer</p>
     </footer>
     <script src="js/scroll.js?1.0"></script>
+
 </body>
 
 </html>

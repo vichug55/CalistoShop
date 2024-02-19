@@ -3,35 +3,34 @@
    require 'conexion.php';
     $db=conectarDB();
 
-   $query="SELECT * FROM articulos WHERE tipo_de_ato='Tazas'";
+   $query="SELECT * FROM articulos WHERE tipo_de_ato='Pulseras'";
    $resultadoPro=mysqli_query($db,$query);
 
    if(isset($_SESSION['login'])) {
     // El cliente ha iniciado sesión
     $auth = $_SESSION['login'];
-    } else {
-        // El cliente no ha iniciado sesión
-        $auth = null;
-    }
+} else {
+    // El cliente no ha iniciado sesión
+    $auth = null;
+}
 
-    if(isset($_SESSION['usuario'])) {
-        $correo = $_SESSION['usuario'];
-        $query="SELECT * FROM clientes WHERE correo='$correo'";
-    $resultado=mysqli_query($db,$query);
+if(isset($_SESSION['usuario'])) {
+    $correo = $_SESSION['usuario'];
+    $query="SELECT * FROM clientes WHERE correo='$correo'";
+ $resultado=mysqli_query($db,$query);
 
-    $usuario=mysqli_fetch_assoc($resultado);
+ $usuario=mysqli_fetch_assoc($resultado);
 
-    $foto_de_perfil=$usuario['foto_de_perfil'];
-    } else {
-        $correo = null;
-    }
+ $foto_de_perfil=$usuario['foto_de_perfil'];
+} else {
+    $correo = null;
+}
 
-    if(isset($_SESSION['id'])) {
-        $clte_id = $_SESSION['id'];
-    } else {
-        $clte_id = null;
-    }
-
+if(isset($_SESSION['id'])) {
+    $clte_id = $_SESSION['id'];
+} else {
+    $clte_id = null;
+}
 
    if($_SERVER['REQUEST_METHOD']==='POST'){
     $id=$_POST['id'];
@@ -58,7 +57,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilos/styles.css">
     <link rel="shortcut icon" href="imagenes/logo.png">
-    <script src="js/buscador.js"></script>
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
     <title>Calisto Shop</title>
 </head>
@@ -92,14 +90,14 @@
     <nav class="navegacion">
         <a class="navegacion__enlace" href="sudaderas.php">Sudaderas</a>
         <a class="navegacion__enlace" href="playeras.php">Playeras</a>
-        <a class="navegacion__enlace navegacion__enlace--activo" href="tazas.php">Tazas</a>
+        <a class="navegacion__enlace" href="tazas.php">Tazas</a>
         <a class="navegacion__enlace" href="fundas.php">Fundas</a>
-        <a class="navegacion__enlace" href="pulseras.php">Pulseras</a>
+        <a class="navegacion__enlace navegacion__enlace--activo" href="pulseras.php">Pulseras</a>
         
     </nav>
 
     <main class="contenedor">
-        <h1>Tazas</h1>
+        <h1>Pulseras</h1>
 
         
         <div class="grid">
@@ -125,5 +123,6 @@
         <p class="footer__texto">Footer</p>
     </footer>
     <script src="js/scroll.js?1.0"></script>
+
 </body>
 </html>

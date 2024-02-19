@@ -41,34 +41,39 @@
     header('Location: /calistoshop/login.php');
     }
 
-  $query0="SELECT * FROM empleados WHERE correo='$correo'";
-  $resultado0=mysqli_query($db,$query0);
-
-
-  $usuario=mysqli_fetch_assoc($resultado0);
-
-  $jefe_id=$usuario['id'];
-
    $id=$_GET['id'];
    $id=filter_var($id,FILTER_VALIDATE_INT);
 
    if(!$id){
     header('Location: /calistoshop/listaArticulos.php');
    }
+   $query0="SELECT * FROM colores WHERE ato_id='$id'";
+   $resultado0=mysqli_query($db,$query0);
+
+   $query1="SELECT * FROM tallas WHERE ato_id='$id'";
+   $resultado1=mysqli_query($db,$query1);
   
 
   if($_SERVER['REQUEST_METHOD']==='POST'){
 
-    $talla=$_POST['tallas'];
+    
+    $color=mysqli_escape_string($db,$_POST['color']);
+    $talla=mysqli_escape_string($db,$_POST['talla']);
 
-    $query="INSERT INTO tallas (talla,ato_id) 
-    VALUES ('$talla','$id');";
+    if($color=="" and $talla==""){
+        $query3="INSERT INTO inventario (ato_id) 
+        VALUES ('$id');";
+    }else{
+        $query3="INSERT INTO inventario (col_id,tal_id,ato_id) 
+        VALUES ('$color','$talla','$id');";
+    }
 
+    
 
-    $resultado=mysqli_query($db,$query);
+    $resultado3=mysqli_query($db,$query3);
+    
 
-
-    if($resultado){
+    if($resultado3){
         header('Location: /calistoshop/listaArticulos.php');
     }
 
@@ -158,38 +163,49 @@
 		</ul>
 	</nav>
  
-    <h3>Registro articulo</h3>
+    <h3>Registro combinacion</h3>
     
 
-    <form class="formulario--colores" method="POST" name="fvalida" enctype="multipart/form-data" onsubmit="return validarArticulo()">
+    <form class="formulario--colores" method="POST" name="fvalida" onsubmit="return validarInventario()">
         <fieldset>
             <div class="contenedor-campos--colores">
 
                 <div class="campo-articulo">
+                    <label><span></span>Color</label>
+                    <select class="input-text" name="color">
+                        <option disabled selected>--Selecciona color</option>
+                        <?php while($col_id=mysqli_fetch_assoc($resultado0)):?>
+                        <option style="background-color: <?php echo $col_id['color'];?>;" value="<?php echo $col_id['id'];?>"></option>    
+                        <?php endwhile; ?>    
+                    </select>
+                </div>
+
+                <div class="campo-articulo">
                     <label><span></span>Tallas</label>
-                    <select class="input-text" name="tallas">
-                        <option>Talla</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
+                    <select class="input-text" name="talla">
+                        <option disabled selected>--Selecciona talla</option>
+                        <?php while($tal_id=mysqli_fetch_assoc($resultado1)):?>
+                        <option value="<?php echo $tal_id['id'];?>"><?php echo $tal_id['talla'];?></option>    
+                        <?php endwhile; ?>  
                     </select>
                 </div>
                
             </div>
 
             <div class="alinear-derecha flex">
-                <input class="boton" type="submit" value="Agregar talla" >
+                <input class="boton" type="submit" value="Agregar combinación" >
             </div>
 
         </fieldset>
     </form>
 
+
+    
     <footer id="footer" class="footer">
         <p class="footer__texto">Footer</p>
     </footer>
     <script src="js/scroll.js?1.0"></script>
+    
 </body>
 
 </html>

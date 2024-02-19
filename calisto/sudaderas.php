@@ -1,36 +1,36 @@
 <?php
-   session_start();
+    session_start();
    require 'conexion.php';
     $db=conectarDB();
 
-   $query="SELECT * FROM articulos WHERE tipo_de_ato='Tazas'";
+   $query="SELECT * FROM articulos WHERE tipo_de_ato='Sudaderas'";
    $resultadoPro=mysqli_query($db,$query);
 
    if(isset($_SESSION['login'])) {
     // El cliente ha iniciado sesión
     $auth = $_SESSION['login'];
-    } else {
-        // El cliente no ha iniciado sesión
-        $auth = null;
-    }
+} else {
+    // El cliente no ha iniciado sesión
+    $auth = null;
+}
 
-    if(isset($_SESSION['usuario'])) {
-        $correo = $_SESSION['usuario'];
-        $query="SELECT * FROM clientes WHERE correo='$correo'";
-    $resultado=mysqli_query($db,$query);
+if(isset($_SESSION['usuario'])) {
+    $correo = $_SESSION['usuario'];
+    $query="SELECT * FROM clientes WHERE correo='$correo'";
+ $resultado=mysqli_query($db,$query);
 
-    $usuario=mysqli_fetch_assoc($resultado);
+ $usuario=mysqli_fetch_assoc($resultado);
 
-    $foto_de_perfil=$usuario['foto_de_perfil'];
-    } else {
-        $correo = null;
-    }
+ $foto_de_perfil=$usuario['foto_de_perfil'];
+} else {
+    $correo = null;
+}
 
-    if(isset($_SESSION['id'])) {
-        $clte_id = $_SESSION['id'];
-    } else {
-        $clte_id = null;
-    }
+if(isset($_SESSION['id'])) {
+    $clte_id = $_SESSION['id'];
+} else {
+    $clte_id = null;
+}
 
 
    if($_SERVER['REQUEST_METHOD']==='POST'){
@@ -90,16 +90,16 @@
     </header>
     
     <nav class="navegacion">
-        <a class="navegacion__enlace" href="sudaderas.php">Sudaderas</a>
+        <a class="navegacion__enlace navegacion__enlace--activo" href="sudaderas.php">Sudaderas</a>
         <a class="navegacion__enlace" href="playeras.php">Playeras</a>
-        <a class="navegacion__enlace navegacion__enlace--activo" href="tazas.php">Tazas</a>
+        <a class="navegacion__enlace" href="tazas.php">Tazas</a>
         <a class="navegacion__enlace" href="fundas.php">Fundas</a>
         <a class="navegacion__enlace" href="pulseras.php">Pulseras</a>
         
     </nav>
 
     <main class="contenedor">
-        <h1>Tazas</h1>
+        <h1>Sudaderas</h1>
 
         
         <div class="grid">
@@ -114,6 +114,7 @@
                 </a>
 
             </div><!--producto-->
+            
            <?php endwhile;?>
 
         </div>
@@ -125,5 +126,6 @@
         <p class="footer__texto">Footer</p>
     </footer>
     <script src="js/scroll.js?1.0"></script>
+
 </body>
 </html>

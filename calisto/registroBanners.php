@@ -37,39 +37,38 @@
         $clte_id = null;
     }
 
-    if(!$auth || $rol!='A'){
+    if(!$auth){
     header('Location: /calistoshop/login.php');
     }
 
-  $query0="SELECT * FROM empleados WHERE correo='$correo'";
-  $resultado0=mysqli_query($db,$query0);
+$queryCat="SELECT * FROM categorias";
+  $resultadoCat=mysqli_query($db,$queryCat);
+  $categoria=mysqli_fetch_assoc($resultadoCat);
 
-
-  $usuario=mysqli_fetch_assoc($resultado0);
-
-  $jefe_id=$usuario['id'];
-
-   $id=$_GET['id'];
-   $id=filter_var($id,FILTER_VALIDATE_INT);
-
-   if(!$id){
-    header('Location: /calistoshop/listaArticulos.php');
-   }
-  
 
   if($_SERVER['REQUEST_METHOD']==='POST'){
 
-    $talla=$_POST['tallas'];
+    $nombre=$_POST['nombre'];
+    $imagen=$_FILES['imagen'];
+    $cat_id=$_POST['cat_id'];
 
-    $query="INSERT INTO tallas (talla,ato_id) 
-    VALUES ('$talla','$id');";
+    $carpetaImagen="imagenes/banners/";
+    if(!is_dir($carpetaImagen)){
+        mkdir($carpetaImagen);
+    }
+
+    $nombreImagen=md5(uniqid(rand(),true)).".jpg";
+    move_uploaded_file($imagen['tmp_name'],$carpetaImagen.$nombreImagen);
+
+    $query="INSERT INTO banners (nombre, imagen,cat_id) 
+    VALUES ('$nombre','$nombreImagen','$cat_id');";
 
 
     $resultado=mysqli_query($db,$query);
 
 
     if($resultado){
-        header('Location: /calistoshop/listaArticulos.php');
+        header('Location: /calistoshop/AdminPage.php');
     }
 
 
@@ -87,7 +86,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Staatliches&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="estilos/styles.css">
     <link rel="shortcut icon" href="imagenes/logo.png">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css">
     <script src="js/validacion.js"></script>
+    <script src="js/fotos.js"></script>
 </head>
 
 <body>
@@ -161,26 +162,34 @@
     <h3>Registro articulo</h3>
     
 
-    <form class="formulario--colores" method="POST" name="fvalida" enctype="multipart/form-data" onsubmit="return validarArticulo()">
+    <form class="formulario--colores" method="POST" name="fvalida" enctype="multipart/form-data" >
         <fieldset>
             <div class="contenedor-campos--colores">
 
                 <div class="campo-articulo">
-                    <label><span></span>Tallas</label>
-                    <select class="input-text" name="tallas">
-                        <option>Talla</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
+                    <label><span>*</span>Nombre</label>
+                    <input class="input-text" type="text" name="nombre" placeholder ="Nombre">
+                </div>
+
+                <div class="campo-articulo">
+                    <label><span>*</span>Imagen</label>
+                    <input class="input-text" type="file" name="imagen" accept="image/jpeg, image/png">
+                </div>
+
+                <div class="campo-articulo">
+                    <label><span>*</span>Categoria</label>
+                    <select class="input-text" name="cat_id">
+                    <option disabled selected>Categoria</option>
+                        <?php do{?>
+                        <option value="<?php echo $categoria['id'];?>"><?php echo $categoria['categoria'];?></option>    
+                        <?php }while($categoria=mysqli_fetch_assoc($resultadoCat)); ?> 
                     </select>
                 </div>
                
             </div>
 
             <div class="alinear-derecha flex">
-                <input class="boton" type="submit" value="Agregar talla" >
+                <input class="boton" type="submit" value="Agregar banner" >
             </div>
 
         </fieldset>
